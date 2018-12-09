@@ -1,0 +1,137 @@
+<div class="container">
+  <div class="jumbotron" *ngIf='!isLoggedIn' style="margin-top:10px; background-color:transparent">
+    <h2 style="margin-left:120px">BONEY'S REAL-TIME CHAT APP</h2>
+  </div>
+  <div class="row login-row" *ngIf='!isLoggedIn'>
+    <div class="col">
+      <label style="color:red" *ngIf='loginError'>{{ loginError }}</label><br />
+      Please enter your unique user name:
+      <input type="text" class="form-control login-textbox" [(ngModel)]="userName">
+      <input type="submit" class="btn btn-primary" style="margin-bottom:10px" value="Login" (click)='login()'>
+    </div>
+  </div>
+  <div class="row" *ngIf='isLoggedIn'>
+    <div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <!-- <div class="recent_heading">
+              <h4>Online Users</h4>
+            </div> -->
+            <div>
+              <span>Welcome {{userName}}! </span>&nbsp;&nbsp;
+              <input type="button" class="btn-link" (click)='logout()' value="Logout">
+            </div>
+            <!-- <div class="srch_bar">
+              <div class="stylish-input-group">
+                <input type="text" class="search-bar" placeholder="Search">
+                <span class="input-group-addon">
+                  <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                </span> </div>
+            </div> -->
+          </div>
+          <div class="inbox_chat">
+            <div *ngFor='let user of onlineUsers'>
+              <div [ngClass]="getCssClassForUser(user)" *ngIf='user.name !== userName' (click)='selectUser(user)'>
+                <div class="chat_people">
+                  <div class="chat_img"> <img src="assets/images/user-profile.png"> </div>
+                  <div class="chat_ib">
+                    <h5>{{user.name}}<span class="chat_date">Online</span></h5>
+                    <p></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mesgs" *ngIf='!toUserName'>
+          <div class="msgContent" id="msgContent">
+            <h4 *ngIf='isAnyOtherUserOnline()'>Click on an user to chat with!</h4>
+            <h5 *ngIf='!isAnyOtherUserOnline()'>No other user seems to be online. Please wait till an
+              user comes online. Or you can login as a different user in a different browser session.
+            </h5>
+            <br />
+            <br />
+            <div>
+              Some facts regarding the Chat App:
+            </div>
+            <ul>
+              <li>
+                Client is fully built on Angular 7
+              </li>
+              <li>
+                Server is powered by GraphQL
+              </li>
+              <li>
+                Realtime communication is made possible by WebSocket connection between the client and server
+              </li>
+              <li>
+                Single websocket connection per client
+              </li>
+              <li>
+                Multiple channels will be created in the single connection to recieve data from multiple users
+              </li>
+              <li>
+                Server and Client both are hosted in AWS (Server in ECS and Client in S3)
+              </li>
+              <li>
+                There are few more features to be implemented to have the App production ready. I will work on them
+                over time.
+                Things to be implemented:
+                <ul>
+                  <li>
+                    Implement database in server side. As is now users and messages are stored in server memory. And
+                    will go off when serve restarts.
+                  </li>
+                  <li>
+                    Implement password based login for users. As is now there is no login. Just entering an username
+                    will login the user
+                  </li>
+                  <li>
+                    Implement "send contact request" and allow users to send messages only to contacts who accepted
+                    contact request. As is now any user can send message to any online user.
+                  </li>
+                  <li>
+                    Performance optimization. There is lot of room for performance improvement.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Code is available here and free for anyone to use. Let me know of any bugs you may come across
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="mesgs">
+          <div class="msgContent" id="msgContent">
+            <div class="msg_history" *ngFor='let msg of messageStore.get(toUserName)'>
+              <div class="incoming_msg" *ngIf='msg.from === toUserName'>
+                <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png">
+                </div>
+                <div class="received_msg">
+                  <div class="received_withd_msg">
+                    <p>{{ msg.content }}</p>
+                    <span class="time_date"> {{ msg.dateTime }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="outgoing_msg" *ngIf='msg.from === userName'>
+                <div class="sent_msg">
+                  <p>{{ msg.content }}</p>
+                  <span class="time_date"> {{ msg.dateTime }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="type_msg" *ngIf='toUserName'>
+            <div class="input_msg_write">
+              <input type="text" class="form-control" style="border: solid 1px" placeholder="Type a message"
+                [(ngModel)]="inputMessage" />
+              <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true" (click)='send()'></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
