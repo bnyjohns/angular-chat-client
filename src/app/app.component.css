@@ -149,6 +149,13 @@ div.chat_list:hover {
   height:580px;
   background-color:#007bff80
 }
+.container-fluid{
+  margin-top: 10px;
+  border: 1px solid #c4c4c4;
+  width: 800px;
+  height:580px;
+  background-color:#007bff80
+}
 .messageNotification{
   background-color: greenyellow
 }

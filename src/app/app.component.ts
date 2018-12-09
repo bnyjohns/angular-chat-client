@@ -188,6 +188,10 @@ export class AppComponent implements OnInit, OnDestroy {
       const isActive = u === this.toUserName;
       this.onlineUsers.push({ name: u, isActive });
     });
+
+    if(!some(users, u => u === this.toUserName))
+      this.toUserName = null;
+
     if(initializeMessageSubscription)
       this.initializeMessageSubscriptions();
   }
