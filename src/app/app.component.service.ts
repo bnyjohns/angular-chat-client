@@ -6,6 +6,7 @@ import { HttpLink } from 'apollo-angular-link-http';
 import { WebSocketLink } from 'apollo-link-ws';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import gql from 'graphql-tag';
+import { environment } from '../environments/environment';
 
 
 @Injectable({
@@ -15,7 +16,7 @@ import gql from 'graphql-tag';
 export class AppComponentService{
   wsLink: WebSocketLink;
   constructor(){
-    const wsUrl = `ws://localhost:9000/`;
+    const wsUrl = environment.serverUrl;
     const subsciptionClient = new SubscriptionClient(wsUrl,
     {
         reconnect: false,
