@@ -38,8 +38,7 @@
                 <div class="chat_people">
                   <div class="chat_img"> <img src="assets/images/user-profile.png"> </div>
                   <div class="chat_ib">
-                    <h5>{{user.name}}</h5>
-                    <!-- <span class="chat_date">Online</span> -->
+                    <h5>{{user.name}}<span class="chat_date" style="color:transparent">Online</span></h5>
                     <p></p>
                   </div>
                 </div>
@@ -85,10 +84,6 @@
                   <li>
                     Implement database in server side. As is now users and messages are stored in server memory. And
                     will go off when serve restarts.
-                  </li>
-                  <li>
-                    Implement password based login for users. As is now there is no login. Just entering an username
-                    will login the user
                   </li>
                   <li>
                     Implement "send contact request" and allow users to send messages only to contacts who accepted

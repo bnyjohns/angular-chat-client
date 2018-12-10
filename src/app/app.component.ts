@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
   password: string;
   onlineUsers: any[] = [];
   loginError: string
-  toUserName: string;
+  toUserName: string = null;
   messageStore: Map<string, Message[]> = new Map<string, Message[]>();
   subscriptionTracker: Map<string, Boolean> = new Map<string, Boolean>();
   inputMessage: string = null;
@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.onlineUsers.forEach(u => {
       u.isActive = u.name === this.toUserName;
       if (u.name === user.name)
-        u.sentMessage = false;
+        u.showNotification = false;
     });
   }
 
@@ -134,7 +134,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 this.messageStore.set(u.name, messages);
               });
               if (!receiveMessage.initialPush) {
-                this.showUserSentMessage(receiveMessage.receivedMessage[0].from);
+                this.setSentMessageNotification(receiveMessage.receivedMessage[0].from);
               }
             }
             else if (response.errors) {
@@ -147,10 +147,10 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  showUserSentMessage(fromUserName) {
+  setSentMessageNotification(fromUserName) {
     this.onlineUsers.forEach(u => {
       if (u.name === fromUserName)
-        u.sentMessage = true;
+        u.showNotification = true;
     })
   }
 
@@ -158,7 +158,7 @@ export class AppComponent implements OnInit, OnDestroy {
     let className = 'chat_list';
     if (user.isActive)
       className += ' active_chat';
-    if (user.sentMessage)
+    if (user.showNotification)
       className += ' messageNotification';
     return className;
   }
@@ -171,8 +171,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.onlineUsers.push({ name: u, isActive });
     });
 
-    if(!some(users, u => u === this.toUserName))
-      this.toUserName = null;
+    //If the user whom I was chatting with went offline, handle it below
+    // if(!some(users, u => u === this.toUserName))
+    //   this.toUserName = null;
 
     if(initializeMessageSubscription)
       this.initializeMessageSubscriptions();
