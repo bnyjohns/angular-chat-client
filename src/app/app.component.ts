@@ -24,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'graphql-chat-client';
   isLoggedIn: boolean;
   userName: string;
+  password: string;
   onlineUsers: any[] = [];
   loginError: string
   toUserName: string;
@@ -36,11 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.appComponentService.getUsers()
-    .subscribe(response => {
-      if (response.data && response.data.getUsers)
-          this.setOnlineUsers(response.data.getUsers, false);
-    });
+
   }
 
   ngOnDestroy(){
@@ -50,8 +47,10 @@ export class AppComponent implements OnInit, OnDestroy {
   resetState(): void{
     this.isLoggedIn = false;
     this.userName = null;
+    this.password = null;
     this.loginError = null;
     this.toUserName = null;
+    this.onlineUsers = [];
     this.messageStore = new Map<string, Message[]>();
     this.subscriptionTracker = new Map<string, Boolean>();
     this.inputMessage = null;
@@ -60,7 +59,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   logout(): void{
-    this.removeUser(this.userName);
     this.resetState();
   }
 
@@ -95,8 +93,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   login(): void {
     this.loginError = null;
-    if (!this.userName) {
-      this.loginError = 'user name is mandatory'
+    if (!this.userName || !this.password) {
+      this.loginError = 'user name/password is mandatory'
       return;
     }
 
@@ -107,36 +105,20 @@ export class AppComponent implements OnInit, OnDestroy {
       })
     this.subscriptionHandles.push(handle);
 
-    if (this.onlineUsers.find(u => u.name.toLowerCase() === this.userName.toLowerCase())) {
-      this.initializeMessageSubscriptions();
-      this.isLoggedIn = true;
-      return;
-    }
-
-    this.appComponentService.addUser(this.userName)
+    this.appComponentService.addUser(this.userName, this.password)
       .subscribe(response => {
         if (response.data && response.data.addUser) {
           this.setOnlineUsers(response.data.addUser, true);
           this.isLoggedIn = true;
         }
-        else {
+        else if(response.errors && response.errors.length > 0){
           console.log(response);
-          this.loginError = 'unexpected error';
+          this.loginError = response.errors[0].message;
+        }
+        else{
+          console.log(response);
         }
       })
-  }
-
-  removeUser(userName): void{
-    this.appComponentService.removeUser(userName)
-    .subscribe(response => {
-      if (response.data && response.data.removeUser) {
-        this.setOnlineUsers(response.data.removeUser, false);
-      }
-      else {
-        console.log(response);
-        this.loginError = response.errors;
-      }
-    })
   }
 
   initializeMessageSubscriptions() {

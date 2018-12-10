@@ -64,13 +64,16 @@ export class AppComponentService{
     })
   }
 
-  addUser(userName): Observable<any>{
+  addUser(userName, password): Observable<any>{
     return execute(this.wsLink, {
-      query: gql`mutation addUser($user: String!){
+      query: gql`mutation addUser($user: UserInput!){
         addUser(user: $user)
       }`,
       variables: {
-        user: userName
+        user: {
+          id: userName,
+          password
+        }
       }
     })
   }

@@ -7,6 +7,8 @@
       <label style="color:red" *ngIf='loginError'>{{ loginError }}</label><br />
       Please enter your unique user name:
       <input type="text" class="form-control login-textbox" [(ngModel)]="userName">
+      Please enter the password:
+      <input type="password" class="form-control login-textbox" [(ngModel)]="password">
       <input type="submit" class="btn btn-primary" style="margin-bottom:10px" value="Login" (click)='login()'>
     </div>
   </div>
@@ -36,7 +38,8 @@
                 <div class="chat_people">
                   <div class="chat_img"> <img src="assets/images/user-profile.png"> </div>
                   <div class="chat_ib">
-                    <h5>{{user.name}}<span class="chat_date">Online</span></h5>
+                    <h5>{{user.name}}</h5>
+                    <!-- <span class="chat_date">Online</span> -->
                     <p></p>
                   </div>
                 </div>
