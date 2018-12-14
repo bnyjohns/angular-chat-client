@@ -133,7 +133,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 messages.push(message);
                 this.messageStore.set(u.name, messages);
               });
-              if (!receiveMessage.initialPush) {
+              if (!receiveMessage.initialPush ||
+                (receiveMessage.initialPush && receiveMessage.receivedMessage.length > 0)) {
                 this.setSentMessageNotification(receiveMessage.receivedMessage[0].from);
               }
             }
