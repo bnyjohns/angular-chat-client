@@ -34,11 +34,11 @@
           </div>
           <div class="inbox_chat">
             <div *ngFor='let user of onlineUsers'>
-              <div [ngClass]="getCssClassForUser(user)" *ngIf='user.name !== userName' (click)='selectUser(user)'>
+              <div [ngClass]="getCssClassForUser(user)" *ngIf='user.userName !== userName' (click)='selectUser(user)'>
                 <div class="chat_people">
                   <div class="chat_img"> <img src="assets/images/user-profile.png"> </div>
                   <div class="chat_ib">
-                    <h5>{{user.name}}<span class="chat_date" style="color:transparent">Online</span></h5>
+                    <h5>{{user.userName}}<span [ngClass]="getOnlineCssClass(user)"></span></h5>
                     <p></p>
                   </div>
                 </div>
@@ -46,7 +46,7 @@
             </div>
           </div>
         </div>
-        <div class="mesgs" *ngIf='!toUserName'>
+        <div class="mesgs" [style.display]='!toUserName ? "block": "none"' *ngIf='!toUserName'>
           <div class="msgContent" id="msgContent">
             <h4 *ngIf='isAnyOtherUserOnline()'>Click on an user to chat with!</h4>
             <h5 *ngIf='!isAnyOtherUserOnline()'>No other user seems to be online. Please wait till an
@@ -103,7 +103,7 @@
         </div>
         <div class="mesgs">
           <div class="msgContent" id="msgContent">
-            <div class="msg_history" *ngFor='let msg of messageStore.get(toUserName)'>
+            <div *ngFor='let msg of messageStore.get(toUserName)'>
               <div class="incoming_msg" *ngIf='msg.from === toUserName'>
                 <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png">
                 </div>

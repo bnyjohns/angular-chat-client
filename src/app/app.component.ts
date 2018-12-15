@@ -3,7 +3,7 @@ import { Message } from './message';
 import { AppComponentService } from './app.component.service';
 import * as moment from 'moment';
 import { HostListener } from '@angular/core';
-import { some } from 'lodash';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +20,12 @@ export class AppComponent implements OnInit, OnDestroy {
       else
         this.login();
     }
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  public beforeunloadHandler(event) {
+    if(this.isLoggedIn)
+      this.logout();
   }
   title = 'graphql-chat-client';
   isLoggedIn: boolean;
@@ -40,11 +46,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.resetState();
   }
 
-  resetState(): void{
+  resetState(): void {
     this.isLoggedIn = false;
     this.userName = null;
     this.password = null;
@@ -58,15 +64,19 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptionHandles = [];
   }
 
-  logout(): void{
-    this.resetState();
+  logout(): void {
+    this.appComponentService.logOffUser(this.userName)
+      .subscribe(_ => {
+        console.log(_);
+        this.resetState();
+      });
   }
 
   selectUser(user): void {
-    this.toUserName = user.name;
+    this.toUserName = user.userName;
     this.onlineUsers.forEach(u => {
-      u.isActive = u.name === this.toUserName;
-      if (u.name === user.name)
+      u.active = u.userName === this.toUserName;
+      if (u.userName === user.userName)
         u.showNotification = false;
     });
   }
@@ -87,8 +97,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.inputMessage = null;
   }
 
-  isAnyOtherUserOnline(): boolean{
-    return (this.onlineUsers && some(this.onlineUsers, u => u.name !== this.userName));
+  isAnyOtherUserOnline(): boolean {
+    return (this.onlineUsers && _.some(this.onlineUsers, u => u.userName !== this.userName));
   }
 
   login(): void {
@@ -111,11 +121,11 @@ export class AppComponent implements OnInit, OnDestroy {
           this.setOnlineUsers(response.data.addUser, true);
           this.isLoggedIn = true;
         }
-        else if(response.errors && response.errors.length > 0){
+        else if (response.errors && response.errors.length > 0) {
           console.log(response);
           this.loginError = response.errors[0].message;
         }
-        else{
+        else {
           console.log(response);
         }
       })
@@ -123,15 +133,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   initializeMessageSubscriptions() {
     this.onlineUsers.forEach(u => {
-      if (!this.subscriptionTracker.has(u.name) && u.name !== this.userName) {
-        const handle = this.appComponentService.receiveMessage(this.userName, u.name)
+      if (!this.subscriptionTracker.has(u.userName) && u.userName !== this.userName) {
+        const handle = this.appComponentService.receiveMessage(this.userName, u.userName)
           .subscribe(response => {
-            const messages = this.messageStore.get(u.name) || [];
+            const messages = this.messageStore.get(u.userName) || [];
             if (response && response.data && response.data.receiveMessage) {
               const receiveMessage = response.data.receiveMessage;
               receiveMessage.receivedMessage.forEach(message => {
                 messages.push(message);
-                this.messageStore.set(u.name, messages);
+                this.messageStore.set(u.userName, messages);
               });
               if (!receiveMessage.initialPush ||
                 (receiveMessage.initialPush && receiveMessage.receivedMessage.length > 0)) {
@@ -143,40 +153,53 @@ export class AppComponent implements OnInit, OnDestroy {
             }
           });
         this.subscriptionHandles.push(handle);
-        this.subscriptionTracker.set(u.name, true);
+        this.subscriptionTracker.set(u.userName, true);
       }
     });
   }
 
   setSentMessageNotification(fromUserName) {
     this.onlineUsers.forEach(u => {
-      if (u.name === fromUserName)
+      if (u.userName === fromUserName)
         u.showNotification = true;
     })
   }
 
   getCssClassForUser(user): string {
     let className = 'chat_list';
-    if (user.isActive)
+    if (user.active)
       className += ' active_chat';
     if (user.showNotification)
       className += ' messageNotification';
     return className;
   }
 
+  getOnlineCssClass(user): string {
+    let className = 'dot';
+    if (user.online)
+      className += ' green';
+    else
+      className += ' red';
+    return className;
+  }
+
   setOnlineUsers(users, initializeMessageSubscription): void {
     if (!users) return;
+    const onlineUsersClone = _.cloneDeep(this.onlineUsers);
     this.onlineUsers = [];
     users.forEach(u => {
-      const isActive = u === this.toUserName;
-      this.onlineUsers.push({ name: u, isActive });
+      const active = u.userName === this.toUserName;
+      const user = { userName: u.userName, active, online: u.online, showNotification: false };
+      const userClone = onlineUsersClone.find(uc => uc.userName === u.userName);
+      if (userClone) user.showNotification = userClone.showNotification;
+      this.onlineUsers.push(user);
     });
 
     //If the user whom I was chatting with went offline, handle it below
     // if(!some(users, u => u === this.toUserName))
     //   this.toUserName = null;
 
-    if(initializeMessageSubscription)
+    if (initializeMessageSubscription)
       this.initializeMessageSubscriptions();
   }
 }

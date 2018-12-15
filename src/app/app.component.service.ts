@@ -1,8 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Apollo } from 'apollo-angular';
-import { ApolloQueryResult } from 'apollo-client';
-import { split, createOperation, execute, Observable } from 'apollo-link';
-import { HttpLink } from 'apollo-angular-link-http';
+import { execute, Observable } from 'apollo-link';
 import { WebSocketLink } from 'apollo-link-ws';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import gql from 'graphql-tag';
@@ -28,18 +26,13 @@ export class AppComponentService{
     this.wsLink = new WebSocketLink(subsciptionClient);
   }
 
-  getUsers(): Observable<any>{
-    return execute(this.wsLink, {
-      query: gql`query getUsers{
-        getUsers
-      }`
-    })
-  }
-
   onlineUsers(): Observable<any>{
     return execute(this.wsLink, {
       query: gql`subscription onlineUsers{
-        onlineUsers
+        onlineUsers{
+          userName
+          online
+        }
       }`
     })
   }
@@ -67,24 +60,30 @@ export class AppComponentService{
   addUser(userName, password): Observable<any>{
     return execute(this.wsLink, {
       query: gql`mutation addUser($user: UserInput!){
-        addUser(user: $user)
+        addUser(user: $user){
+          userName
+          online
+        }
       }`,
       variables: {
         user: {
-          id: userName,
+          userName,
           password
         }
       }
     })
   }
 
-  removeUser(userName): Observable<any>{
+  logOffUser(userName): Observable<any>{
     return execute(this.wsLink, {
-      query: gql`mutation removeUser($user: String!){
-        removeUser(user: $user)
+      query: gql`mutation logOffUser($userName: String!){
+        logOffUser(userName: $userName){
+          userName
+          online
+        }
       }`,
       variables: {
-        user: userName
+        userName
       }
     })
   }

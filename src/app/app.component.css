@@ -5,6 +5,7 @@ img{ max-width:100%;}
   float: left;
   overflow: hidden;
   width: 40%; border-right:1px solid #c4c4c4;
+  height: 578px;
 }
 .inbox_msg {
   clear: both;
@@ -168,4 +169,18 @@ div.chat_list:hover {
 .login-row{
   margin: 10px 180px;
   border: solid 1px
+}
+
+.dot{
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-top: 3px;
+}
+.green{
+  background-color: green
+}
+.red{
+  background-color: red
 }
