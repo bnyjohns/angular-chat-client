@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "graphql-chat-client": {
+    "angular-chat-client": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/graphql-chat-client",
+            "outputPath": "dist/angular-chat-client",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -57,12 +57,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "graphql-chat-client:build",
+            "browserTarget": "angular-chat-client:build",
             "port": 4200
           },
           "configurations": {
             "production": {
-              "browserTarget": "graphql-chat-client:build:production",
+              "browserTarget": "angular-chat-client:build:production",
               "port": 80
             }
           }
@@ -70,7 +70,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "graphql-chat-client:build"
+            "browserTarget": "angular-chat-client:build"
           }
         },
         "test": {
@@ -104,7 +104,7 @@
         }
       }
     },
-    "graphql-chat-client-e2e": {
+    "angular-chat-client-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -113,11 +113,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "graphql-chat-client:serve"
+            "devServerTarget": "angular-chat-client:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "graphql-chat-client:serve:production"
+              "devServerTarget": "angular-chat-client:serve:production"
             }
           }
         },
@@ -133,5 +133,5 @@
       }
     }
   },
-  "defaultProject": "graphql-chat-client"
+  "defaultProject": "angular-chat-client"
 }

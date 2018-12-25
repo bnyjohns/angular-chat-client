@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn)
       this.logout();
   }
-  title = 'graphql-chat-client';
+  title = 'angular-chat-client';
   isLoggedIn: boolean;
   userName: string;
   password: string;
