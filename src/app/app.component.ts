@@ -24,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeunload', ['$event'])
   public beforeunloadHandler(event) {
-    if(this.isLoggedIn)
+    if (this.isLoggedIn)
       this.logout();
   }
   title = 'graphql-chat-client';
@@ -40,6 +40,26 @@ export class AppComponent implements OnInit, OnDestroy {
   subscriptionHandles: Array<ZenObservable.Subscription> = []
 
   constructor(private appComponentService: AppComponentService) {
+  }
+
+  showDesktopNotification(from, message): void{
+    if(!('Notification' in window) ){
+      console.log('Web Notification not supported');
+      return;
+    }
+
+    Notification.requestPermission()
+    .then(_ => {
+      var notification = new Notification(`New message from ${from}`,
+                          { body:message,
+                            icon:'http://i.stack.imgur.com/Jzjhz.png?s=48&g=1',
+                            dir:'auto'
+                          });
+      setTimeout(function(){
+          notification.close();
+      },3000);
+    })
+    .catch(e => console.log(`error getting desktop notification permission`, e));
   }
 
   ngOnInit(): void {
@@ -139,14 +159,16 @@ export class AppComponent implements OnInit, OnDestroy {
             const messages = this.messageStore.get(u.userName) || [];
             if (response && response.data && response.data.receiveMessage) {
               const receiveMessage = response.data.receiveMessage;
+              const message = receiveMessage.receivedMessage[0];
+              if(!receiveMessage.initialPush && this.userName !== message.from){
+                this.showDesktopNotification(message.from, message.content);
+              }
               receiveMessage.receivedMessage.forEach(message => {
                 messages.push(message);
                 this.messageStore.set(u.userName, messages);
               });
-              if (!receiveMessage.initialPush ||
-                (receiveMessage.initialPush && receiveMessage.receivedMessage.length > 0)) {
+              if(receiveMessage.receivedMessage.length > 0)
                 this.setSentMessageNotification(receiveMessage.receivedMessage[0].from);
-              }
             }
             else if (response.errors) {
               console.log(response.errors);
